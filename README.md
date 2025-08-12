@@ -1,15 +1,13 @@
-# Nome do projeto
-Escreva um ou dois parágrafo resumindo o objetivo do seu projeto.
+# Sistema de Matrículas
+O objetivo do sistema é informatizar o processo de matrícula de uma Universidade.
 
 ## Integrantes
-* Nome completo do aluno 1
-* Nome completo do aluno 2
-* Nome completo do aluno 3
-* Nome completo do aluno 4
+* Arlindo Sergio Pereira Junior
+* Arthur Astolfi Cardoso
+* Vitor Costa Vianna
 
 ## Orientadores
-* Nome completo do professor 1
-* Nome completo do professor 2
+* João Pedro Oliveira
 
 ## Instruções de utilização
 Assim que a primeira versão do sistema estiver disponível, deverá complementar com as instruções de utilização. Descreva como instalar eventuais dependências e como executar a aplicação.

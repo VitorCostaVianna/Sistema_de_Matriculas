@@ -1,21 +1,16 @@
 package users;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import subject.Discipline;
+import services.Enrolment;
 
 
 public class Student extends User {
 
-    private List<Discipline> disciplines;
-
+    private Enrolment enrolment;
     private boolean enrolmentActive;
 
     public Student(String name, String email, String password) {
         super(name, email, password);
         setEnrolmentActive(true);
-        disciplines = new ArrayList<>();
         try {
             java.io.File studentFile = new java.io.File("student_" + name.replaceAll("\\s+", "_") + ".txt");
             if (studentFile.createNewFile()) {
@@ -28,27 +23,6 @@ public class Student extends User {
         }
     }
 
-    public void enrolCourse(Discipline discipline) {
-        if (isEnrolmentActive()) {
-            this.disciplines.add(discipline);
-            discipline.getStudents().add(this);
-        }
-    }
-
-    public void enrolOptionaldiscipline(Discipline discipline) {
-        if (isEnrolmentActive()) {
-            this.disciplines.add(discipline);
-            discipline.getStudents().add(this);
-        }
-    }
-
-    public void canceldiscipline(Discipline discipline) {
-        if (isEnrolmentActive()) {
-            this.disciplines.remove(discipline);
-            discipline.getStudents().remove(this);
-        }
-    }
-
     public boolean isEnrolmentActive() {
         return enrolmentActive;
     }
@@ -57,7 +31,8 @@ public class Student extends User {
         this.enrolmentActive = enrolmentActive;
     }
 
-    public List<Discipline> getDisciplines() {
-        return disciplines;
+    public Enrolment getEnrolment() {
+        return enrolment;
     }
+
 }

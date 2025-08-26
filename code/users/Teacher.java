@@ -1,5 +1,7 @@
 package users;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,13 +14,11 @@ public class Teacher extends User{
     public Teacher(String name, String email, String password) {
         super(name, email, password);
         this.disciplines = new ArrayList<>();
-         try {
-            java.io.File teacherFile = new java.io.File("teacher_" + name.replaceAll("\\s+", "_") + ".txt");
-            if (teacherFile.createNewFile()) {
-                java.io.FileWriter writer = new java.io.FileWriter(teacherFile);
-                writer.write("Nome: " + name + "\nEmail: " + email + "\n");
-                writer.close();
-            }
+        try {
+            File teacherFile = new File("Teachers.txt");
+            FileWriter writer = new FileWriter(teacherFile, true); // append mode
+            writer.write("Nome: " + name + ", Email: " + email + ", Password: " + password + "\n");
+            writer.close();
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }

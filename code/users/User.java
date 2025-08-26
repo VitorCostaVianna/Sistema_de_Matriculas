@@ -3,6 +3,16 @@ package users;
 import java.util.UUID;
 
 public class User {
+    // Autentica usuário verificando ambos os arquivos de usuários
+    public static boolean loginFromAllFiles(String email, String password) {
+        String[] files = {"Students.txt", "Teachers.txt"};
+        for (String file : files) {
+            if (loginFromFile(email, password, file)) {
+                return true;
+            }
+        }
+        return false;
+    }
     private String id;
     private String name;
     private String email;
@@ -44,13 +54,65 @@ public class User {
     }
 
     public boolean login(String email, String password) {
-       // TODO: Implement login logic
-       return false;
+        return this.email.equals(email) && this.password.equals(password);
+    }
+
+    public static boolean loginFromFile(String email, String password, String filePath) {
+        String[] files = {"Students.txt", "Teachers.txt"};
+        for (String file : files) {
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    String foundEmail = null;
+                    String foundPassword = null;
+                    for (String part : parts) {
+                        part = part.trim();
+                        if (part.startsWith("Email:")) {
+                            foundEmail = part.replace("Email:", "").trim();
+                        }
+                        if (part.startsWith("Password:")) {
+                            foundPassword = part.replace("Password:", "").trim();
+                        }
+                    }
+                    if (foundEmail != null && foundPassword != null && foundEmail.equals(email) && foundPassword.equals(password)) {
+                        return true;
+                    }
+                }
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
     }
 
     public String recoverPassword(String email){
-        // TODO: Implement password recovery logic
-        return "Password recovery link sent to " + email;
+        String[] files = {"Students.txt", "Teachers.txt"};
+        for (String file : files) {
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    String foundEmail = null;
+                    String foundPassword = null;
+                    for (String part : parts) {
+                        part = part.trim();
+                        if (part.startsWith("Email:")) {
+                            foundEmail = part.replace("Email:", "").trim();
+                        }
+                        if (part.startsWith("Password:")) {
+                            foundPassword = part.replace("Password:", "").trim();
+                        }
+                    }
+                    if (foundEmail != null && foundEmail.equals(email)) {
+                        return "Sua senha é: " + (foundPassword != null ? foundPassword : "não encontrada");
+                    }
+                }
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return "Email não encontrado.";
     }
 
     public String getPassword() {

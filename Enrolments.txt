@@ -1,0 +1,10 @@
+Id da matrícula: null, Nome: Arlindo, Email: arlindo@gmail.com, Período: 
+Id da matrícula: null, Nome: arlindo, Email: teste@gmail.com, Período: 
+Id da matrícula: null, Nome: astolfi, Email: test@gmail, Período: 
+Id da matrícula: 1d36467c-4e20-4476-a496-49e10a0b121f, Nome: arlindo, Email: teste@gmail.com, Período: 
+Id da matrícula: 6e91cca9-e67c-4ff8-974f-79b888a14b12, Nome: astolfi, Email: test@gmail, Período: 
+Id da matrícula: 7af0913c-d178-4a3b-be74-50d388118561, Nome: astolfi, Email: test@gmail, Período: 2025-08-28
+Id da matrícula: 9bcfc72e-e6a8-4f2a-95a5-322e59b0402f, Nome: arlindo, Email: teste@gmail.com, Período: 2025-08-29
+Id da matrícula: b439a3d9-23fa-4c01-b691-2a7c76db68bd, Nome: arlindo, Email: teste@gmail.com, Período: 2025-08-30
+Id da matrícula: 548c693d-bf2e-4533-b57f-9fac0d235f2f, Nome: arlindo, Email: teste@gmail.com, Período: 2025-09-20
+Id da matrícula: ef0e94b9-face-4bee-95f8-62a529375afc, Nome: astolfi, Email: test@gmail, Período: 2025-09-28

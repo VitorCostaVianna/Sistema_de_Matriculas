@@ -1,5 +1,9 @@
 package users;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import services.Enrolment;
 
 
@@ -9,19 +13,25 @@ public class Student extends User {
     private boolean enrolmentActive;
 
     public Student(String name, String email, String password) {
+        this(name, email, password, true);
+    }
+
+    // Novo construtor: salva no arquivo apenas se for cadastro
+    public Student(String name, String email, String password, boolean salvarArquivo) {
         super(name, email, password);
         setEnrolmentActive(true);
-        try {
-            java.io.File studentFile = new java.io.File("student_" + name.replaceAll("\\s+", "_") + ".txt");
-            if (studentFile.createNewFile()) {
-                java.io.FileWriter writer = new java.io.FileWriter(studentFile);
-                writer.write("Nome: " + name + "\nEmail: " + email + "\n");
+        if (salvarArquivo) {
+            try {
+                File studentFile = new File("Students.txt");
+                FileWriter writer = new FileWriter(studentFile, true); // append mode
+                writer.write("Nome: " + name + ", Email: " + email + ", Password: " + password + ", Enrol Active: " + enrolmentActive + "\n");
                 writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
         }
     }
+    
 
     public boolean isEnrolmentActive() {
         return enrolmentActive;

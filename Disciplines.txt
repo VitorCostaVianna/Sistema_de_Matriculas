@@ -1,0 +1,1 @@
+Nome: Java 8, Professor: Astolfi, Obrigatória: true, Créditos: 100

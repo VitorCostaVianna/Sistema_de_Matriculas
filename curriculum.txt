@@ -1,0 +1,1 @@
+Período: 1 | Disciplinas: [Nome: Java 8, Professor: Astolfi, Obrigatória: true, Créditos: 100] | Professores: [Nome: Astolfi, Email: astolfi@gmail.com, Password: admin] | Alunos: [Nome: arlindo, Email: teste@gmail.com, Password: 123, Nome: astolfi, Email: test@gmail, Password: 123, Enrol Active: true]

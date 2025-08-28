@@ -1,6 +1,7 @@
 package services;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.UUID;
@@ -17,6 +18,7 @@ public class Enrolment {
     public Enrolment(Student student, LocalDate enrolPeriod) {
         this.student = student;
         this.enrolPeriod = enrolPeriod;
+        this.disciplines = new ArrayList<>();
         try {
             java.io.File enrolmentFile = new java.io.File("Enrolments.txt");
             java.io.FileWriter writer = new java.io.FileWriter(enrolmentFile, true); // append mode
@@ -35,8 +37,8 @@ public class Enrolment {
         this.enrolPeriod = enrolPeriod;
     }
 
-    public void enrolCourse(Discipline discipline) {
-        if (student.isEnrolmentActive() && verifyenrolPeriodDate(enrolPeriod)) {
+    public void enrolCourse(Discipline discipline, Student student) {
+        if (student.isEnrolmentActive() && verifyenrolPeriodDate()) {
             this.disciplines.add(discipline);
             try {
                 java.io.File file = new java.io.File("AlunoDisciplinas.txt");
@@ -44,7 +46,6 @@ public class Enrolment {
                 writer.write("Aluno: " + student.getName()
                     + ", Email: " + student.getEmail()
                     + ", Disciplina: " + discipline.getName()
-                    + ", Período: " + (enrolPeriod != null ? enrolPeriod.toString() : "")
                     + System.lineSeparator());
                 writer.close();
                 System.out.println("Aluno registrado em AlunoDisciplinas.txt!");
@@ -57,7 +58,7 @@ public class Enrolment {
     }
 
     public void enrolOptionaldiscipline(Discipline discipline) {
-        if (student.isEnrolmentActive() && verifyenrolPeriodDate(enrolPeriod)) {
+        if (student.isEnrolmentActive() && verifyenrolPeriodDate()) {
             this.disciplines.add(discipline);
         }
 
@@ -74,7 +75,7 @@ public class Enrolment {
         // TODO - alterar satatus do curso no arquivo
     }
 
-    private boolean verifyenrolPeriodDate(LocalDate now) {
-        return now.isBefore(enrolPeriod) ? true : false;
+    private boolean verifyenrolPeriodDate() {
+        return LocalDate.now().isBefore(enrolPeriod) ? true : false;
     }
 }

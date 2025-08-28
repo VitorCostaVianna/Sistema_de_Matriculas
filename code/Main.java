@@ -24,6 +24,7 @@ public class Main {
             System.out.println("6. Adicionar disciplina");
             System.out.println("7. Matricular estudante em disciplina");
             System.out.println("8. Adicionar currículo");
+            // System.out.println("8. Set período de matrícula"); // Criar esse case para a secretária adicionar o periodo de matrícula e salvar em algum arquivo.
             System.out.println("0. Sair");
             System.out.print("Escolha uma opção: ");
             int opcao = Integer.parseInt(scanner.nextLine());
@@ -149,7 +150,8 @@ public class Main {
                     System.out.print("Nome da disciplina para matrícula: ");
                     String matDisc = scanner.nextLine();
                     Discipline disciplina = new Discipline(teacher, true, matDisc, 60L);
-                    enrolment.enrolCourse(disciplina);
+                    System.out.println("Enrol Perid: " + alunoEscolhido.isEnrolmentActive());
+                    enrolment.enrolCourse(disciplina, alunoEscolhido);
                     System.out.println("Aluno matriculado!");
                     break;
                 case 8:

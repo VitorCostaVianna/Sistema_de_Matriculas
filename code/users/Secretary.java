@@ -1,6 +1,6 @@
 package users;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import subject.Discipline;
 
@@ -23,7 +23,13 @@ public class Secretary extends User {
         }
     }
 
-    public void setEnrolPeriod(Date startDate, Date endDate) {
+    public void setEnrolPeriod(LocalDate endDate) {
+        try (java.io.FileWriter writer = new java.io.FileWriter("EnrolPeriod.txt", true)) {
+            writer.write("Data Final: " + endDate
+                + System.lineSeparator());
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
        
     }
 

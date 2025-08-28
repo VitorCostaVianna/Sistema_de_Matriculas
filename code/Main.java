@@ -4,6 +4,8 @@ import users.Secretary;
 import users.User;
 import services.Enrolment;
 import subject.Discipline;
+
+import java.time.LocalDate;
 import java.util.Scanner;
 
 public class Main {
@@ -24,7 +26,7 @@ public class Main {
             System.out.println("6. Adicionar disciplina");
             System.out.println("7. Matricular estudante em disciplina");
             System.out.println("8. Adicionar currículo");
-            // System.out.println("8. Set período de matrícula"); // Criar esse case para a secretária adicionar o periodo de matrícula e salvar em algum arquivo.
+            System.out.println("9. Set período de matrícula"); 
             System.out.println("0. Sair");
             System.out.print("Escolha uma opção: ");
             int opcao = Integer.parseInt(scanner.nextLine());
@@ -119,7 +121,8 @@ public class Main {
                                 aluno = new Student(nome, email, senha, false);
                             }
                             alunos.add(aluno);
-                            System.out.println(idx + ". " + nome + " (" + email + ") - Enrol Active: " + (enrolActive != null ? enrolActive : "true"));
+                            System.out.println(idx + ". " + nome + " (" + email + ") - Enrol Active: "
+                                    + (enrolActive != null ? enrolActive : "true"));
                             idx++;
                         }
                     } catch (java.io.IOException e) {
@@ -137,16 +140,7 @@ public class Main {
                         break;
                     }
                     Student alunoEscolhido = alunos.get(escolha - 1);
-                    System.out.print("Digite a data do período de matrícula (AAAA-MM-DD): ");
-                    String dataStr = scanner.nextLine();
-                    java.time.LocalDate enrolPeriod = null;
-                    try {
-                        enrolPeriod = java.time.LocalDate.parse(dataStr);
-                    } catch (Exception e) {
-                        System.out.println("Data inválida. Usando data atual.");
-                        enrolPeriod = java.time.LocalDate.now();
-                    }
-                    enrolment = new Enrolment(alunoEscolhido, enrolPeriod);
+                    enrolment = new Enrolment(alunoEscolhido);
                     System.out.print("Nome da disciplina para matrícula: ");
                     String matDisc = scanner.nextLine();
                     Discipline disciplina = new Discipline(teacher, true, matDisc, 60L);
@@ -163,6 +157,31 @@ public class Main {
                     String periodo = scanner.nextLine();
                     secretary.addCurriculum(periodo);
                     System.out.println("Currículo adicionado!");
+                    break;
+                case 9:
+                    if (secretary == null) {
+                        System.out.println("Crie um secretário primeiro.");
+                        break;
+                    }
+                    System.out.println("Digite a data final para matrícula (dd/MM/yyyy): ");
+                    String dataFinal = scanner.nextLine();
+
+                    try {
+                        // Converte String para LocalDate
+                        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+                                .ofPattern("dd/MM/yyyy");
+                        LocalDate dataFinalLocalDate = LocalDate.parse(dataFinal, formatter);
+
+                        // Passa o LocalDate para o método
+                        secretary.setEnrolPeriod(dataFinalLocalDate);
+
+                        System.out.println("Data final de matrícula definida: " +
+                                dataFinalLocalDate.format(formatter));
+
+                    } catch (java.time.format.DateTimeParseException e) {
+                        System.out.println("Formato de data inválido! Use o formato dd/MM/yyyy");
+                        System.out.println("Exemplo: 31/12/2024");
+                    }
                     break;
                 case 0:
                     System.out.println("Saindo...");

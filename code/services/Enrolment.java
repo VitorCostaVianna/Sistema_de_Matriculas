@@ -12,12 +12,10 @@ import users.Student;
 public class Enrolment {
     private String id = UUID.randomUUID().toString();
     private Student student;
-    private LocalDate enrolPeriod;
     private List<Discipline> disciplines;
 
-    public Enrolment(Student student, LocalDate enrolPeriod) {
+    public Enrolment(Student student) {
         this.student = student;
-        this.enrolPeriod = enrolPeriod;
         this.disciplines = new ArrayList<>();
         try {
             java.io.File enrolmentFile = new java.io.File("Enrolments.txt");
@@ -25,16 +23,11 @@ public class Enrolment {
             writer.write("Id da matrícula: " + id
                 + ", Nome: " + student.getName()
                 + ", Email: " + student.getEmail()
-                + ", Período: " + enrolPeriod
                 + System.lineSeparator());
             writer.close();
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void setEnrolPeriod(LocalDate enrolPeriod) {
-        this.enrolPeriod = enrolPeriod;
     }
 
     public void enrolCourse(Discipline discipline, Student student) {
@@ -76,6 +69,56 @@ public class Enrolment {
     }
 
     private boolean verifyenrolPeriodDate() {
-        return LocalDate.now().isBefore(enrolPeriod) ? true : false;
+    try {
+        java.io.File file = new java.io.File("EnrolPeriod.txt");
+        
+        if (!file.exists()) {
+            System.out.println("Arquivo EnrolPeriod.txt não encontrado!");
+            return false;
+        }
+        
+        java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file));
+        String line;
+        LocalDate finalDate = null;
+        
+        // Procura pela linha que contém "Data Final"
+        while ((line = reader.readLine()) != null) {
+            if (line.toLowerCase().contains("data final")) {
+                // Extrai a data da linha
+                // Exemplo: "Data Final: 2024-12-31" ou "Data Final: 31/12/2024"
+                String[] parts = line.split(":");
+                if (parts.length > 1) {
+                    String dateStr = parts[1].trim();
+                    try {
+                        // Tenta formato ISO (yyyy-MM-dd)
+                        finalDate = LocalDate.parse(dateStr);
+                    } catch (java.time.format.DateTimeParseException e) {
+                        try {
+                            // Tenta formato brasileiro (dd/MM/yyyy)
+                            java.time.format.DateTimeFormatter formatter = 
+                                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                            finalDate = LocalDate.parse(dateStr, formatter);
+                        } catch (java.time.format.DateTimeParseException e2) {
+                            System.out.println("Erro ao converter data: " + dateStr);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        reader.close();
+        
+        if (finalDate == null) {
+            System.out.println("Data Final não encontrada no arquivo!");
+            return false;
+        }
+        
+        // Retorna true se a data atual for anterior à data final
+        return LocalDate.now().isBefore(finalDate);
+        
+    } catch (java.io.IOException e) {
+        System.out.println("Erro ao ler arquivo EnrolPeriod.txt: " + e.getMessage());
+        return false;
     }
+}
 }

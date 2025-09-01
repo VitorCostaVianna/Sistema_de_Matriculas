@@ -4,3 +4,4 @@ Nome: Carlos, Email: carlos@gmail.com, Password: 123
 Nome: tulio, Email: tulio@gmail.com, Password: 123
 Nome: matheus, Email: matehus@gmail.com, Password: 123
 Nome: pedro, Email: p@gmail.com, Password: 123
+Nome: astolfi, Email: astolfi@gmail.com, Password: 123

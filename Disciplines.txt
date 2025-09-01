@@ -2,3 +2,7 @@ Nome: Java 8, Professor: Astolfi, Obrigatória: true, Créditos: 100
 Id: 6f45d95c-c97c-4964-8236-209187f43db7, Nome: gerografia, Créditos: 24, Obrigatória: false, Professor: pedro
 Id: c0483ec0-0b96-4a50-bcc2-5c34f43ccfe2, Nome: historia, Créditos: 56, Obrigatória: false, Professor: pedro
 Id: 81af0de1-02f8-4339-8acd-084ae1a855a2, Nome: matemattica, Créditos: 67, Obrigatória: false, Professor: pedro
+Id: 5b9ad769-4467-4c98-9934-2979668de197, Nome: aeds, Créditos: 100, Obrigatória: true, Professor: astolfi
+Id: 49626fc0-36f1-49bc-85a3-8fc485008af3, Nome: calculo, Créditos: 100, Obrigatória: true, Professor: astolfi
+Id: 2878c8cd-9e1d-4571-ac2f-0cdffa54c0a2, Nome: web, Créditos: 100, Obrigatória: true, Professor: astolfi
+Id: 6972a528-1676-4303-98a3-2aeaa25fd84b, Nome: bd, Créditos: 100, Obrigatória: true, Professor: astolfi

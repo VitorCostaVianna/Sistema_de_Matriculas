@@ -5,6 +5,9 @@ import users.User;
 import services.Enrolment;
 import subject.Discipline;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +33,8 @@ public class Main {
             System.out.println("6. Adicionar disciplina");
             System.out.println("7. Matricular estudante em disciplina");
             System.out.println("8. Adicionar currículo");
-            System.out.println("9. Set período de matrícula"); 
+            System.out.println("9. Set período de matrícula");
+            System.out.println("10. Buscar alunos por disciplina: ");
             System.out.println("0. Sair");
             System.out.print("Escolha uma opção: ");
             int opcao = Integer.parseInt(scanner.nextLine());
@@ -149,7 +153,8 @@ public class Main {
                     // Pergunta ao usuário:
                     String tipoDisciplina = "";
                     while (true) {
-                        System.out.print("Deseja matricular em disciplina 'obrigatoria' ou 'opcional'? Digite exatamente: ");
+                        System.out.print(
+                                "Deseja matricular em disciplina 'obrigatoria' ou 'opcional'? Digite exatamente: ");
                         tipoDisciplina = scanner.nextLine().trim().toLowerCase();
                         if (tipoDisciplina.equals("obrigatoria") || tipoDisciplina.equals("opcional")) {
                             break;
@@ -223,6 +228,40 @@ public class Main {
                     } catch (java.time.format.DateTimeParseException e) {
                         System.out.println("Formato de data inválido! Use o formato dd/MM/yyyy");
                         System.out.println("Exemplo: 31/12/2024");
+                    }
+                    break;
+                case 10:
+                    System.out.println("Digite a matéria desejada: ");
+                    String disciplina = scanner.nextLine().trim().toLowerCase();
+
+                    try (BufferedReader br = new BufferedReader(new FileReader("AlunoDisciplinas.txt"))) {
+                        String linha;
+                        boolean encontrou = false;
+
+                        while ((linha = br.readLine()) != null) {
+                            // Exemplo: nome: astolfi, email: astolfi@gmail.com, disciplina: historia, tipo:
+                            // opcional
+                            String[] partes = linha.split(","); // separa em 4 pedaços
+
+                            if (partes.length == 4) {
+                                String nome = partes[0].split(":")[1].trim();
+                                String email = partes[1].split(":")[1].trim();
+                                String materia = partes[2].split(":")[1].trim().toLowerCase();
+                                String tipo = partes[3].split(":")[1].trim();
+
+                                if (materia.equals(disciplina)) {
+                                    System.out.println("Aluno: " + nome + " | Email: " + email + " | Tipo: " + tipo);
+                                    encontrou = true;
+                                }
+                            }
+                        }
+
+                        if (!encontrou) {
+                            System.out.println("Nenhum aluno encontrado para a disciplina: " + disciplina);
+                        }
+
+                    } catch (IOException e) {
+                        System.out.println("Erro ao ler o arquivo: " + e.getMessage());
                     }
                     break;
                 case 0:

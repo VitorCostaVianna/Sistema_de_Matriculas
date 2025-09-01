@@ -1,2 +1,2 @@
-Nome: arlindo, Email: teste@gmail.com, Password: 123
-Nome: astolfi, Email: test@gmail, Password: 123, Enrol Active: true
+Nome: arlindo, Email: arlindo@gmail.com, Password: 123, Enrol Active: true
+Nome: astolfi, Email: astolfi@gmail.com, Password: 123, Enrol Active: true

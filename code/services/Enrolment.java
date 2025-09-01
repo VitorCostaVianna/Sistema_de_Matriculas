@@ -3,9 +3,7 @@ package services;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.UUID;
-
 import subject.Discipline;
 import users.Student;
 
@@ -33,8 +31,46 @@ public class Enrolment {
         }
     }
 
+    private void atualizarArquivoAlunoUnico(Student student, int obrigatorias, int opcionais) {
+        try {
+            java.io.File file = new java.io.File("AlunosMaterias.txt");
+            List<String> linhas = new ArrayList<>();
+            boolean alunoEncontrado = false;
+            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("email: " + student.getEmail())) {
+                    // Atualiza a linha do aluno
+                    line = "nome: " + student.getName() + ", email: " + student.getEmail()
+                            + ", obrigatorias: " + obrigatorias + ", opcionais: " + opcionais;
+                    alunoEncontrado = true;
+                }
+                linhas.add(line);
+            }
+            reader.close();
+
+            // Se o aluno não foi encontrado, adiciona uma nova linha
+            if (!alunoEncontrado) {
+                linhas.add("nome: " + student.getName() + ", email: " + student.getEmail()
+                        + ", obrigatorias: " + obrigatorias + ", opcionais: " + opcionais);
+            }
+
+            java.io.FileWriter writer = new java.io.FileWriter(file, false); // sobrescreve tudo
+            for (String l : linhas) {
+                writer.write(l + System.lineSeparator());
+            }
+            writer.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void enrolCourse(Discipline discipline, Student student) {
-        if (obrigatoriasMatriculadas >= 4) {
+        int[] quantidades = buscarQuantidadesAluno(student.getEmail());
+        int obrigatorias = quantidades[0];
+        int opcionais = quantidades[1];
+
+        if (obrigatorias >= 4) {
             System.out.println("Limite de 4 disciplinas obrigatórias atingido.");
             return;
         }
@@ -43,24 +79,18 @@ public class Enrolment {
             return;
         }
         disciplines.add(discipline);
-        obrigatoriasMatriculadas++; // Incrementa ao matricular
-        try {
-            java.io.File file = new java.io.File("AlunoDisciplinas.txt");
-            java.io.FileWriter writer = new java.io.FileWriter(file, true);
-            writer.write("Aluno: " + student.getName()
-                + ", Email: " + student.getEmail()
-                + ", Disciplina: " + discipline.getName()
-                + System.lineSeparator());
-            writer.close();
-            System.out.println("Aluno registrado em AlunoDisciplinas.txt!");
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
+        obrigatorias++; // incrementa manualmente
+        atualizarArquivoAlunoUnico(student, obrigatorias, opcionais);
+        registrarMatriculaAluno(student, discipline, "obrigatoria");
         System.out.println("Matrícula obrigatória realizada!");
     }
 
     public void enrolOptionaldiscipline(Discipline discipline) {
-        if (opcionaisMatriculadas >= 2) {
+        int[] quantidades = buscarQuantidadesAluno(student.getEmail());
+        int obrigatorias = quantidades[0];
+        int opcionais = quantidades[1];
+
+        if (opcionais >= 2) {
             System.out.println("Limite de 2 disciplinas opcionais atingido.");
             return;
         }
@@ -69,20 +99,9 @@ public class Enrolment {
             return;
         }
         disciplines.add(discipline);
-        opcionaisMatriculadas++; // Incrementa ao matricular
-        try {
-            java.io.File file = new java.io.File("AlunoDisciplinas.txt");
-            java.io.FileWriter writer = new java.io.FileWriter(file, true);
-            writer.write("Aluno: " + student.getName()
-                + ", Email: " + student.getEmail()
-                + ", Disciplina: " + discipline.getName()
-                + ", Tipo: Opcional"
-                + System.lineSeparator());
-            writer.close();
-            System.out.println("Aluno registrado em AlunoDisciplinas.txt!");
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
+        opcionais++; // incrementa manualmente
+        atualizarArquivoAlunoUnico(student, obrigatorias, opcionais);
+        registrarMatriculaAluno(student, discipline, "opcional");
         System.out.println("Matrícula opcional realizada!");
     }
 
@@ -148,7 +167,47 @@ public class Enrolment {
     }
 }
 
+private int[] buscarQuantidadesAluno(String email) {
+    int obrigatorias = 0;
+    int opcionais = 0;
+    try {
+        java.io.File file = new java.io.File("AlunosMaterias.txt");
+        java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            if (line.contains("email: " + email)) {
+                String[] partes = line.split(",");
+                for (String parte : partes) {
+                    parte = parte.trim();
+                    if (parte.startsWith("obrigatorias:")) {
+                        obrigatorias = Integer.parseInt(parte.replace("obrigatorias:", "").trim());
+                    }
+                    if (parte.startsWith("opcionais:")) {
+                        opcionais = Integer.parseInt(parte.replace("opcionais:", "").trim());
+                    }
+                }
+                break;
+            }
+        }
+        reader.close();
+    } catch (java.io.IOException e) {
+        e.printStackTrace();
+    }
+    return new int[]{obrigatorias, opcionais};
+}
 
-
-
+private void registrarMatriculaAluno(Student student, Discipline discipline, String tipo) {
+    try {
+        java.io.File file = new java.io.File("AlunoDisciplinas.txt");
+        java.io.FileWriter writer = new java.io.FileWriter(file, true); // append
+        writer.write("nome: " + student.getName()
+            + ", email: " + student.getEmail()
+            + ", disciplina: " + discipline.getName()
+            + ", tipo: " + tipo
+            + System.lineSeparator());
+        writer.close();
+    } catch (java.io.IOException e) {
+        e.printStackTrace();
+    }
+}
 }

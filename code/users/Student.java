@@ -3,7 +3,6 @@ package users;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
 import services.Enrolment;
 
 
@@ -14,6 +13,28 @@ public class Student extends User {
 
     public Student(String name, String email, String password) {
         this(name, email, password, true);
+        try {
+            java.io.File file = new java.io.File("AlunosMaterias.txt"); // ou "estudantes.txt"
+            boolean existe = false;
+            if (file.exists()) {
+                java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.contains("email: " + email)) {
+                        existe = true;
+                        break;
+                    }
+                }
+                reader.close();
+            }
+            if (!existe) {
+                java.io.FileWriter writer = new java.io.FileWriter(file, true); // append
+                writer.write("nome: " + name + ", email: " + email + ", obrigatorias: 0, opcionais: 0" + System.lineSeparator());
+                writer.close();
+            }
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // Novo construtor: salva no arquivo apenas se for cadastro

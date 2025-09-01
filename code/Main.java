@@ -16,6 +16,9 @@ import java.util.Scanner;
 public class Main {
     public static List<Discipline> todasDisciplinas = new ArrayList<>();
 
+    // guarda o tipo do usuário após login ("student", "teacher", "secretary")
+    private static String userRole = null;
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Student student = null;
@@ -25,19 +28,50 @@ public class Main {
 
         while (true) {
             System.out.println("\n--- MENU ---");
-            System.out.println("1. Criar estudante");
-            System.out.println("2. Criar professor");
-            System.out.println("3. Criar secretário");
-            System.out.println("4. Login");
-            System.out.println("5. Recuperar senha");
-            System.out.println("6. Adicionar disciplina");
-            System.out.println("7. Matricular estudante em disciplina");
-            System.out.println("8. Adicionar currículo");
-            System.out.println("9. Set período de matrícula");
-            System.out.println("10. Buscar alunos por disciplina: ");
-            System.out.println("0. Sair");
+
+            // ALTERAÇÃO: quando não logado, mostra somente os cases 1,2,3,4,5
+            if (userRole == null) {
+                System.out.println("1. Criar estudante");
+                System.out.println("2. Criar professor");
+                System.out.println("3. Criar secretário");
+                System.out.println("4. Login");
+                System.out.println("5. Recuperar senha");
+                // Obs: case 0 (sair) existe mas não é exibido aqui como você solicitou
+            } else if (userRole.equals("student")) {
+                // Student -> recuperar senha, matricular, sair
+                System.out.println("5. Recuperar senha");
+                System.out.println("7. Matricular estudante em disciplina");
+                System.out.println("0. Sair");
+            } else if (userRole.equals("teacher")) {
+                // Teacher -> recuperar senha, buscar alunos, sair
+                System.out.println("5. Recuperar senha");
+                System.out.println("10. Buscar alunos por disciplina: ");
+                System.out.println("0. Sair");
+            } else if (userRole.equals("secretary")) {
+                // Secretary -> pode ver todas as opções (como antes)
+                System.out.println("1. Criar estudante");
+                System.out.println("2. Criar professor");
+                System.out.println("3. Criar secretário");
+                System.out.println("4. Login");
+                System.out.println("5. Recuperar senha");
+                System.out.println("6. Adicionar disciplina");
+                System.out.println("7. Matricular estudante em disciplina");
+                System.out.println("8. Adicionar currículo");
+                System.out.println("9. Set período de matrícula");
+                System.out.println("10. Buscar alunos por disciplina: ");
+                System.out.println("0. Sair");
+            } else {
+                System.out.println("0. Sair");
+            }
+
             System.out.print("Escolha uma opção: ");
-            int opcao = Integer.parseInt(scanner.nextLine());
+            int opcao;
+            try {
+                opcao = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida. Digite um número.");
+                continue;
+            }
 
             switch (opcao) {
                 case 1:
@@ -71,12 +105,25 @@ public class Main {
                     System.out.println("Secretário criado!");
                     break;
                 case 4:
+                    // LOGIN: mantém o comportamento original de checar login,
+                    // e define userRole para controlar o menu (sem criar instâncias adicionais)
                     System.out.print("Email: ");
                     String lemail = scanner.nextLine();
                     System.out.print("Senha: ");
                     String lpass = scanner.nextLine();
                     boolean login = User.loginFromAllFiles(lemail, lpass);
-                    System.out.println(login ? "Login bem-sucedido!" : "Login falhou.");
+                    if (login) {
+                        System.out.print("Tipo de usuário (student/teacher/secretary): ");
+                        String tipo = scanner.nextLine().trim().toLowerCase();
+                        if (tipo.equals("student") || tipo.equals("teacher") || tipo.equals("secretary")) {
+                            userRole = tipo;
+                            System.out.println("Login bem-sucedido como " + tipo + "!");
+                        } else {
+                            System.out.println("Tipo inválido. Continuando sem definir role.");
+                        }
+                    } else {
+                        System.out.println("Login falhou.");
+                    }
                     break;
                 case 5:
                     System.out.print("Email para recuperar senha: ");
@@ -214,17 +261,12 @@ public class Main {
                     String dataFinal = scanner.nextLine();
 
                     try {
-                        // Converte String para LocalDate
                         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
                                 .ofPattern("dd/MM/yyyy");
                         LocalDate dataFinalLocalDate = LocalDate.parse(dataFinal, formatter);
-
-                        // Passa o LocalDate para o método
                         secretary.setEnrolPeriod(dataFinalLocalDate);
-
                         System.out.println("Data final de matrícula definida: " +
                                 dataFinalLocalDate.format(formatter));
-
                     } catch (java.time.format.DateTimeParseException e) {
                         System.out.println("Formato de data inválido! Use o formato dd/MM/yyyy");
                         System.out.println("Exemplo: 31/12/2024");
@@ -239,15 +281,13 @@ public class Main {
                         boolean encontrou = false;
 
                         while ((linha = br.readLine()) != null) {
-                            // Exemplo: nome: astolfi, email: astolfi@gmail.com, disciplina: historia, tipo:
-                            // opcional
-                            String[] partes = linha.split(","); // separa em 4 pedaços
+                            String[] partes = linha.split(","); // separa em pedaços
 
-                            if (partes.length == 4) {
+                            if (partes.length >= 3) {
                                 String nome = partes[0].split(":")[1].trim();
                                 String email = partes[1].split(":")[1].trim();
                                 String materia = partes[2].split(":")[1].trim().toLowerCase();
-                                String tipo = partes[3].split(":")[1].trim();
+                                String tipo = (partes.length >= 4) ? partes[3].split(":")[1].trim() : "N/A";
 
                                 if (materia.equals(disciplina)) {
                                     System.out.println("Aluno: " + nome + " | Email: " + email + " | Tipo: " + tipo);

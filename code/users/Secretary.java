@@ -1,5 +1,7 @@
 package users;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.time.LocalDate;
 
 import subject.Discipline;
@@ -8,6 +10,14 @@ public class Secretary extends User {
 
     public Secretary(String name, String email, String password) {
         super(name, email, password);
+        try {
+            File teacherFile = new File("Secretary.txt");
+            FileWriter writer = new FileWriter(teacherFile, true); // append mode
+            writer.write("Nome: " + name + ", Email: " + email + ", Password: " + password + "\n");
+            writer.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addDisciplines(Teacher teacher, boolean required, String name, Long creditsNumber) {

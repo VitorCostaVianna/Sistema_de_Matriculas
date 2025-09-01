@@ -1,2 +1,3 @@
 Nome: arlindo, Email: arlindo@gmail.com, Password: 123, Enrol Active: true
 Nome: astolfi, Email: astolfi@gmail.com, Password: 123, Enrol Active: true
+Nome: vitor, Email: vitor@gmail.com, Password: 123, Enrol Active: true

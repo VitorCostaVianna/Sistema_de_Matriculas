@@ -5,7 +5,7 @@ import java.util.UUID;
 public class User {
     // Autentica usuário verificando ambos os arquivos de usuários
     public static boolean loginFromAllFiles(String email, String password) {
-        String[] files = {"Students.txt", "Teachers.txt"};
+        String[] files = {"Students.txt", "Teachers.txt", "Secretary.txt"};
         for (String file : files) {
             if (loginFromFile(email, password, file)) {
                 return true;
@@ -58,7 +58,7 @@ public class User {
     }
 
     public static boolean loginFromFile(String email, String password, String filePath) {
-        String[] files = {"Students.txt", "Teachers.txt"};
+        String[] files = {"Students.txt", "Teachers.txt", "Secretary.txt"};
         for (String file : files) {
             try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
                 String line;
@@ -87,7 +87,7 @@ public class User {
     }
 
     public String recoverPassword(String email){
-        String[] files = {"Students.txt", "Teachers.txt"};
+        String[] files = {"Students.txt", "Teachers.txt", "Secretary.txt"};
         for (String file : files) {
             try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
                 String line;

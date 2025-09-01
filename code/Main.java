@@ -6,7 +6,10 @@ import services.Enrolment;
 import subject.Discipline;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -59,6 +62,7 @@ public class Main {
                 System.out.println("8. Adicionar currículo");
                 System.out.println("9. Set período de matrícula");
                 System.out.println("10. Buscar alunos por disciplina: ");
+                System.out.println("11. Verificar disponibilidade das disciplinas: ");
                 System.out.println("0. Sair");
             } else {
                 System.out.println("0. Sair");
@@ -92,6 +96,7 @@ public class Main {
                     System.out.print("Senha: ");
                     String tpass = scanner.nextLine();
                     teacher = new Teacher(tnome, temail, tpass);
+                    teacher.salvarEmArquivo();
                     System.out.println("Professor criado!");
                     break;
                 case 3:
@@ -105,8 +110,6 @@ public class Main {
                     System.out.println("Secretário criado!");
                     break;
                 case 4:
-                    // LOGIN: mantém o comportamento original de checar login,
-                    // e define userRole para controlar o menu (sem criar instâncias adicionais)
                     System.out.print("Email: ");
                     String lemail = scanner.nextLine();
                     System.out.print("Senha: ");
@@ -118,6 +121,14 @@ public class Main {
                         if (tipo.equals("student") || tipo.equals("teacher") || tipo.equals("secretary")) {
                             userRole = tipo;
                             System.out.println("Login bem-sucedido como " + tipo + "!");
+                            if (tipo.equals("secretary")) {
+                                String nomeTemp = lemail;
+                                int at = lemail.indexOf("@");
+                                if (at > 0)
+                                    nomeTemp = lemail.substring(0, at);
+
+                                secretary = new Secretary(nomeTemp, lemail, lpass);
+                            }
                         } else {
                             System.out.println("Tipo inválido. Continuando sem definir role.");
                         }
@@ -125,25 +136,114 @@ public class Main {
                         System.out.println("Login falhou.");
                     }
                     break;
+
                 case 5:
                     System.out.print("Email para recuperar senha: ");
                     String remail = scanner.nextLine();
                     System.out.println(new User("", "", "").recoverPassword(remail));
                     break;
                 case 6:
-                    if (secretary == null || teacher == null) {
-                        System.out.println("Crie um secretário e um professor primeiro.");
+                    // remover a exigência de 'teacher' em memória — vamos escolher de Teachers.txt
+                    if (secretary == null) {
+                        System.out.println("Crie um secretário primeiro.");
                         break;
                     }
+
+                    // Lê Teachers.txt e popula uma lista de Teacher
+                    java.util.List<Teacher> teachers = new java.util.ArrayList<>();
+                    try (BufferedReader tReader = new BufferedReader(new FileReader("Teachers.txt"))) {
+                        String tLine;
+                        while ((tLine = tReader.readLine()) != null) {
+                            if (tLine.trim().isEmpty())
+                                continue;
+                            String nome = "";
+                            String email = "";
+                            String senha = "";
+                            String[] parts = tLine.split(",");
+                            for (String p : parts) {
+                                p = p.trim();
+                                String lower = p.toLowerCase();
+                                if (lower.startsWith("nome:")) {
+                                    String[] kv = p.split(":", 2);
+                                    if (kv.length == 2)
+                                        nome = kv[1].trim();
+                                } else if (lower.startsWith("email:")) {
+                                    String[] kv = p.split(":", 2);
+                                    if (kv.length == 2)
+                                        email = kv[1].trim();
+                                } else if (lower.startsWith("password:") || lower.startsWith("senha:")) {
+                                    String[] kv = p.split(":", 2);
+                                    if (kv.length == 2)
+                                        senha = kv[1].trim();
+                                }
+                            }
+                            if (nome.isEmpty()) {
+                                nome = tLine.trim();
+                            }
+                            // cria Teacher com o que foi encontrado (senha pode ser vazia)
+                            teachers.add(new Teacher(nome, email, senha));
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Erro ao ler Teachers.txt: " + e.getMessage());
+                        break;
+                    }
+
+                    if (teachers.isEmpty()) {
+                        System.out.println("Nenhum professor cadastrado em Teachers.txt. Crie professores primeiro.");
+                        break;
+                    }
+
+                    // Mostra a lista de professores e pede seleção
+                    System.out.println("Professores disponíveis:");
+                    for (int i = 0; i < teachers.size(); i++) {
+                        Teacher t = teachers.get(i);
+                        String displayName;
+                        try {
+                            displayName = t.getName() + " (" + t.getEmail() + ")";
+                        } catch (Exception ex) {
+                            // caso a classe Teacher não tenha getName/getEmail exposto, cai aqui
+                            displayName = t.toString();
+                        }
+                        System.out.println((i + 1) + ". " + displayName);
+                    }
+
+                    System.out.print("Escolha o número do professor para atribuir à disciplina: ");
+                    int escolhaProf;
+                    try {
+                        escolhaProf = Integer.parseInt(scanner.nextLine());
+                    } catch (NumberFormatException nfe) {
+                        System.out.println("Entrada inválida.");
+                        break;
+                    }
+                    if (escolhaProf < 1 || escolhaProf > teachers.size()) {
+                        System.out.println("Opção inválida.");
+                        break;
+                    }
+                    Teacher professorEscolhido = teachers.get(escolhaProf - 1);
+
+                    // Agora coleta os dados da disciplina normalmente
                     System.out.print("Nome da disciplina: ");
                     String dname = scanner.nextLine();
                     System.out.print("Disciplina obrigatória? (true/false): ");
-                    boolean required = Boolean.parseBoolean(scanner.nextLine());
+                    boolean required;
+                    try {
+                        required = Boolean.parseBoolean(scanner.nextLine());
+                    } catch (Exception e) {
+                        System.out.println("Valor inválido para obrigatório. Use true ou false.");
+                        break;
+                    }
                     System.out.print("Número de créditos: ");
-                    Long creditsNumber = Long.parseLong(scanner.nextLine());
-                    Discipline novaDisciplina = new Discipline(teacher, required, dname, creditsNumber);
+                    Long creditsNumber;
+                    try {
+                        creditsNumber = Long.parseLong(scanner.nextLine());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Número de créditos inválido.");
+                        break;
+                    }
+
+                    Discipline novaDisciplina = new Discipline(professorEscolhido, required, dname, creditsNumber);
                     todasDisciplinas.add(novaDisciplina);
-                    System.out.println("Disciplina adicionada!");
+                    System.out.println("Disciplina adicionada com professor: " + professorEscolhido.getName());
                     break;
                 case 7:
                     java.util.List<Student> alunos = new java.util.ArrayList<>();
@@ -303,6 +403,9 @@ public class Main {
                     } catch (IOException e) {
                         System.out.println("Erro ao ler o arquivo: " + e.getMessage());
                     }
+                    break;
+                case 11:
+                    Discipline.cancelarDisciplinasComPoucosAlunos();
                     break;
                 case 0:
                     System.out.println("Saindo...");

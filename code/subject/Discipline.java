@@ -1,5 +1,11 @@
 package subject;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -8,85 +14,85 @@ import users.Student;
 import users.Teacher;
 
 public class Discipline {
-	private String id;
+    private String id;
     private String name;
     private Long creditsNumber;
-	private List<Student> students;
-	private Teacher teacher;
-	public static final int MAX_STUDENTS = 60; 
-	public static final int MIN_STUDENTS = 3;
-	private Status status;
-	private boolean required;
+    private List<Student> students;
+    private Teacher teacher;
+    public static final int MAX_STUDENTS = 60;
+    public static final int MIN_STUDENTS = 3;
+    private Status status;
+    private boolean required;
 
-	public Discipline(Teacher teacher, boolean required, String name, Long creditsNumber) {
+    public Discipline(Teacher teacher, boolean required, String name, Long creditsNumber) {
         this.setTeacher(teacher);
         this.setStatus(Status.INDEFINITE);
         students = new ArrayList<>();
-		this.setId(generateId());
-		this.required = required;
-		this.creditsNumber = creditsNumber;
-		this.name = name;
+        this.setId(generateId());
+        this.required = required;
+        this.creditsNumber = creditsNumber;
+        this.name = name;
 
-		// Adiciona a disciplina ao arquivo
-		try {
-			java.io.File file = new java.io.File("Disciplines.txt");
-			java.io.FileWriter writer = new java.io.FileWriter(file, true); // append mode
-			writer.write("Id: " + this.id
-				+ ", Nome: " + this.name
-				+ ", Créditos: " + this.creditsNumber
-				+ ", Obrigatória: " + this.required
-				+ ", Professor: " + (teacher != null ? teacher.getName() : "N/A")
-				+ System.lineSeparator());
-			writer.close();
-		} catch (java.io.IOException e) {
-			e.printStackTrace();
-		}
+        // Adiciona a disciplina ao arquivo
+        try {
+            java.io.File file = new java.io.File("Disciplines.txt");
+            java.io.FileWriter writer = new java.io.FileWriter(file, true); // append mode
+            writer.write("Id: " + this.id
+                    + ", Nome: " + this.name
+                    + ", Créditos: " + this.creditsNumber
+                    + ", Obrigatória: " + this.required
+                    + ", Professor: " + (teacher != null ? teacher.getName() : "N/A")
+                    + System.lineSeparator());
+            writer.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
 
-	// Construtor alternativo para leitura do arquivo (não grava no arquivo)
-	public Discipline(Teacher teacher, boolean required, String name, Long creditsNumber, boolean fromFile) {
+    // Construtor alternativo para leitura do arquivo (não grava no arquivo)
+    public Discipline(Teacher teacher, boolean required, String name, Long creditsNumber, boolean fromFile) {
         this.setTeacher(teacher);
         this.setStatus(Status.INDEFINITE);
         students = new ArrayList<>();
-		this.setId(generateId());
-		this.required = required;
-		this.creditsNumber = creditsNumber;
-		this.name = name;
-		// Não grava no arquivo!
+        this.setId(generateId());
+        this.required = required;
+        this.creditsNumber = creditsNumber;
+        this.name = name;
+        // Não grava no arquivo!
     }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
     public void setId(String id) {
         this.id = id;
     }
 
-     private String generateId() {
+    private String generateId() {
         return UUID.randomUUID().toString();
     }
 
-	public List<Student> getStudents() {
-		return students;
-	}
+    public List<Student> getStudents() {
+        return students;
+    }
 
-	public Teacher getTeacher() {
-		return teacher;
-	}
+    public Teacher getTeacher() {
+        return teacher;
+    }
 
-	public Status getStatus() {
-		return status;
-	}
+    public Status getStatus() {
+        return status;
+    }
 
-	public boolean isRequired() {
-		return required;
-	}
+    public boolean isRequired() {
+        return required;
+    }
 
-	public boolean DisciplineViabilityPolicy() {
-		int enrolled = students != null ? students.size() : 0;
-		return enrolled >= MIN_STUDENTS && enrolled <= MAX_STUDENTS;
-	}
+    public boolean DisciplineViabilityPolicy() {
+        int enrolled = students != null ? students.size() : 0;
+        return enrolled >= MIN_STUDENTS && enrolled <= MAX_STUDENTS;
+    }
 
     public void setTeacher(Teacher teacher) {
         this.teacher = teacher;
@@ -112,16 +118,17 @@ public class Discipline {
         this.creditsNumber = creditsNumber;
     }
 
-
     public static List<Discipline> getDisciplinasOpcionaisFromFile() {
         List<Discipline> opcionais = new ArrayList<>();
         try {
             java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader("Disciplines.txt"));
             String line;
             while ((line = reader.readLine()) != null) {
-                // Exemplo de linha: Id: ..., Nome: ..., Créditos: ..., Obrigatória: false, Professor: ...
+                // Exemplo de linha: Id: ..., Nome: ..., Créditos: ..., Obrigatória: false,
+                // Professor: ...
                 if (line.contains("Obrigatória: false")) {
-                    // Extrai os dados necessários (aqui só o nome, mas pode adaptar para mais campos)
+                    // Extrai os dados necessários (aqui só o nome, mas pode adaptar para mais
+                    // campos)
                     String[] partes = line.split(",");
                     String nome = "";
                     Long creditos = 0L;
@@ -172,6 +179,68 @@ public class Discipline {
             e.printStackTrace();
         }
         return obrigatorias;
+    }
+
+    public void setStudents(List<Student> students) {
+        this.students = students;
+    }
+
+    public static void cancelarDisciplinasComPoucosAlunos() {
+        File arquivo = new File("Disciplines.txt");
+        List<String> linhas = new ArrayList<>();
+        boolean algumaCancelada = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(arquivo))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                if (linha.trim().isEmpty())
+                    continue;
+
+                String[] partes = linha.split(",");
+                int qtdAlunos = 0;
+                String nomeDisciplina = "";
+
+                for (String parte : partes) {
+                    parte = parte.trim();
+                    if (parte.startsWith("Alunos:")) {
+                        try {
+                            qtdAlunos = Integer.parseInt(parte.split(":")[1].trim());
+                        } catch (NumberFormatException e) {
+                            qtdAlunos = 0;
+                        }
+                    }
+                    if (parte.startsWith("Nome:")) {
+                        nomeDisciplina = parte.split(":")[1].trim();
+                    }
+                }
+
+                if (qtdAlunos < 3) {
+                    System.out.println("Disciplina cancelada: " + nomeDisciplina);
+                    algumaCancelada = true;
+                    // não adiciona -> exclui do arquivo
+                    continue;
+                }
+
+                // mantém a linha
+                linhas.add(linha);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // reescreve o arquivo somente com as disciplinas válidas
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivo, false))) {
+            for (String l : linhas) {
+                writer.write(l);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (!algumaCancelada) {
+            System.out.println("Nenhuma disciplina foi cancelada.");
+        }
     }
 
 }

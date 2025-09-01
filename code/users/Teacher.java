@@ -2,6 +2,7 @@ package users;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,14 +15,6 @@ public class Teacher extends User{
     public Teacher(String name, String email, String password) {
         super(name, email, password);
         this.disciplines = new ArrayList<>();
-        try {
-            File teacherFile = new File("Teachers.txt");
-            FileWriter writer = new FileWriter(teacherFile, true); // append mode
-            writer.write("Nome: " + name + ", Email: " + email + ", Password: " + password + "\n");
-            writer.close();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public List<Discipline> getDisciplines() {
@@ -35,4 +28,15 @@ public class Teacher extends User{
       }
       return mapStudentsPerDiscipline;
     }
+
+    public void salvarEmArquivo() {
+    try {
+        File teacherFile = new File("Teachers.txt");
+        FileWriter writer = new FileWriter(teacherFile, true); // append mode
+        writer.write("Nome: " + getName() + ", Email: " + getEmail() + ", Password: " + getPassword() + "\n");
+        writer.close();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
 }

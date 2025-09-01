@@ -1,3 +1,0 @@
-nome: astolfi, email: astolfi@gmail.com, disciplina: bd, tipo: obrigatoria
-nome: astolfi, email: astolfi@gmail.com, disciplina: matemattica, tipo: opcional
-nome: astolfi, email: astolfi@gmail.com, disciplina: matemattica, tipo: opcional

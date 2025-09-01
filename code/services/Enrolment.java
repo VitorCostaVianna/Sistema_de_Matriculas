@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import subject.Discipline;
 import users.Student;
 
@@ -110,7 +113,7 @@ public class Enrolment {
     public void canceldiscipline(Discipline discipline) {
         if (student.isEnrolmentActive() && this.disciplines.contains(discipline)) {
             this.disciplines.remove(discipline);
-            PaymentSystem.getInstancia().removerCobranca(student, discipline); 
+            PaymentSystem.getInstancia().removerCobranca(student, discipline);
             System.out.println("Disciplina cancelada e cobrança atualizada!");
         } else {
             System.out.println("O aluno não está matriculado nesta disciplina.");
@@ -200,6 +203,7 @@ public class Enrolment {
         return new int[] { obrigatorias, opcionais };
     }
 
+    // substitua o seu método registrarMatriculaAluno atual por este:
     private void registrarMatriculaAluno(Student student, Discipline discipline, String tipo) {
         try {
             java.io.File file = new java.io.File("AlunoDisciplinas.txt");
@@ -210,8 +214,122 @@ public class Enrolment {
                     + ", tipo: " + tipo
                     + System.lineSeparator());
             writer.close();
+
+            // NOVO: incrementa contagem no Disciplines.txt
+            incrementarAlunoNaDisciplina(discipline);
+
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Lê Disciplines.txt, encontra a linha que corresponde à disciplina (procura
+     * "Nome: <nome>")
+     * e incrementa o campo de contagem (procura "Alunos:" ou "Quantidade:" ou
+     * "Students:").
+     * Se não existir campo de contagem, adiciona ", Alunos: 1".
+     */
+    private void incrementarAlunoNaDisciplina(Discipline discipline) {
+        if (discipline == null || discipline.getName() == null) {
+            System.out.println("Disciplina inválida para incremento.");
+            return;
+        }
+
+        java.io.File file = new java.io.File("Disciplines.txt");
+        if (!file.exists()) {
+            System.out.println("Arquivo Disciplines.txt não encontrado!");
+            return;
+        }
+
+        List<String> linhas = new ArrayList<>();
+        boolean encontrou = false;
+
+        // patterns para procurar e substituir o número
+        Pattern pAlunos = Pattern.compile("(?i)(alunos\\s*:\\s*)(\\d+)");
+        Pattern pQuantidade = Pattern.compile("(?i)(quantidade\\s*:\\s*)(\\d+)");
+        Pattern pStudents = Pattern.compile("(?i)(students\\s*:\\s*)(\\d+)");
+
+        String targetName = discipline.getName().trim().toLowerCase();
+
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String originalLine = line;
+                String lower = line.toLowerCase();
+
+                int nomeIdx = lower.indexOf("nome:");
+                if (nomeIdx != -1) {
+                    int start = nomeIdx + "nome:".length();
+                    // extrai valor do nome até a próxima vírgula (ou fim da linha)
+                    int commaIdx = line.indexOf(',', start);
+                    String nomeVal = (commaIdx == -1) ? line.substring(start) : line.substring(start, commaIdx);
+                    nomeVal = nomeVal.trim().toLowerCase();
+
+                    if (nomeVal.equals(targetName)) {
+                        // encontramos a linha da disciplina — vamos incrementar o campo apropriado
+                        encontrou = true;
+                        boolean substituted = false;
+
+                        Matcher m = pAlunos.matcher(line);
+                        if (m.find()) {
+                            int atual = Integer.parseInt(m.group(2));
+                            int novo = atual + 1;
+                            // substituir apenas o número mantendo o grupo 1 (texto "Alunos: ")
+                            line = m.replaceFirst(m.group(1) + novo);
+                            substituted = true;
+                        }
+
+                        if (!substituted) {
+                            m = pQuantidade.matcher(line);
+                            if (m.find()) {
+                                int atual = Integer.parseInt(m.group(2));
+                                int novo = atual + 1;
+                                line = m.replaceFirst(m.group(1) + novo);
+                                substituted = true;
+                            }
+                        }
+
+                        if (!substituted) {
+                            m = pStudents.matcher(line);
+                            if (m.find()) {
+                                int atual = Integer.parseInt(m.group(2));
+                                int novo = atual + 1;
+                                line = m.replaceFirst(m.group(1) + novo);
+                                substituted = true;
+                            }
+                        }
+
+                        if (!substituted) {
+                            // nenhum campo de contagem encontrado -> adicionar ", Alunos: 1" ao final
+                            line = originalLine + ", Alunos: 1";
+                        }
+
+                        System.out.println("Atualizada linha da disciplina: " + line);
+                    }
+                }
+
+                linhas.add(line);
+            }
+        } catch (java.io.IOException e) {
+            System.out.println("Erro ao ler Disciplines.txt: " + e.getMessage());
+            return;
+        }
+
+        if (!encontrou) {
+            System.out.println("Disciplina '" + discipline.getName() + "' não encontrada em Disciplines.txt");
+            // opcional: você pode decidir adicionar uma nova linha com a disciplina e
+            // Alunos:1 aqui
+        } else {
+            // reescreve o arquivo com as linhas atualizadas
+            try (java.io.FileWriter writer = new java.io.FileWriter(file, false)) { // sobrescreve
+                for (String l : linhas) {
+                    writer.write(l + System.lineSeparator());
+                }
+            } catch (java.io.IOException e) {
+                System.out.println("Erro ao escrever Disciplines.txt: " + e.getMessage());
+            }
+        }
+    }
+
 }

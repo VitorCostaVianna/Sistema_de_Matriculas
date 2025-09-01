@@ -1,9 +1,0 @@
-
-Id da matrícula: bac8dd9e-8758-4004-a41d-5e1757aa0305, Nome: astolfi, Email: astolfi@gmail.com
-Id da matrícula: db4fc0ae-4909-4094-b1d8-f1059153c94d, Nome: astolfi, Email: astolfi@gmail.com
-Id da matrícula: de6c034a-b842-4e65-a5e7-b7ae64fe3253, Nome: astolfi, Email: astolfi@gmail.com
-Id da matrícula: 65978b6b-c68a-48d1-809c-905734c6db62, Nome: astolfi, Email: astolfi@gmail.com
-Id da matrícula: b281ff8c-1f15-446b-8f7f-e6cfe4a4612b, Nome: astolfi, Email: astolfi@gmail.com
-Id da matrícula: fcde005b-d1ba-4e01-9d71-8ebe685ec4bd, Nome: astolfi, Email: astolfi@gmail.com
-Id da matrícula: 5c562c62-587e-4308-accd-baf6e726f7c5, Nome: astolfi, Email: astolfi@gmail.com
-Id da matrícula: b00ac869-d6a9-496e-9b78-04ace00d968c, Nome: astolfi, Email: astolfi@gmail.com

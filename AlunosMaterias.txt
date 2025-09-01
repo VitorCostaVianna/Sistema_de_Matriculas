@@ -1,3 +1,0 @@
-nome: astolfi, email: astolfi@gmail.com, obrigatorias: 1, opcionais: 2
-nome: vitor, email: vitor@gmail.com, obrigatorias: 0, opcionais: 0
-nome: vitor@gmail.com, email: 123, obrigatorias: 0, opcionais: 0

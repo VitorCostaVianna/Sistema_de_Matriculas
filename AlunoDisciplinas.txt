@@ -1,2 +1,0 @@
-Aluno: astolfi, Email: test@gmail, Disciplina: Java 8, Período: 2025-10-09
-Aluno: arlindo, Email: teste@gmail.com, Disciplina: Java 8

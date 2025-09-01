@@ -6,9 +6,13 @@ import services.Enrolment;
 import subject.Discipline;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    public static List<Discipline> todasDisciplinas = new ArrayList<>();
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Student student = null;
@@ -82,15 +86,15 @@ public class Main {
                     }
                     System.out.print("Nome da disciplina: ");
                     String dname = scanner.nextLine();
-                    System.out.print("Obrigatória? (true/false): ");
+                    System.out.print("Disciplina obrigatória? (true/false): ");
                     boolean required = Boolean.parseBoolean(scanner.nextLine());
-                    System.out.print("Créditos: ");
-                    Long credits = Long.parseLong(scanner.nextLine());
-                    secretary.addDisciplines(teacher, required, dname, credits);
+                    System.out.print("Número de créditos: ");
+                    Long creditsNumber = Long.parseLong(scanner.nextLine());
+                    Discipline novaDisciplina = new Discipline(teacher, required, dname, creditsNumber);
+                    todasDisciplinas.add(novaDisciplina);
                     System.out.println("Disciplina adicionada!");
                     break;
                 case 7:
-
                     java.util.List<Student> alunos = new java.util.ArrayList<>();
                     try (java.io.BufferedReader reader = new java.io.BufferedReader(
                             new java.io.FileReader("Students.txt"))) {
@@ -141,13 +145,51 @@ public class Main {
                     }
                     Student alunoEscolhido = alunos.get(escolha - 1);
                     enrolment = new Enrolment(alunoEscolhido);
-                    System.out.print("Nome da disciplina para matrícula: ");
-                    String matDisc = scanner.nextLine();
-                    Discipline disciplina = new Discipline(teacher, true, matDisc, 60L);
-                    System.out.println("Enrol Perid: " + alunoEscolhido.isEnrolmentActive());
-                    enrolment.enrolCourse(disciplina, alunoEscolhido);
-                    System.out.println("Aluno matriculado!");
-                    break;
+
+                    // Pergunta ao usuário:
+                    String tipoDisciplina = "";
+                    while (true) {
+                        System.out.print("Deseja matricular em disciplina 'obrigatoria' ou 'opcional'? Digite exatamente: ");
+                        tipoDisciplina = scanner.nextLine().trim().toLowerCase();
+                        if (tipoDisciplina.equals("obrigatoria") || tipoDisciplina.equals("opcional")) {
+                            break;
+                        }
+                        System.out.println("Opção inválida! Digite apenas 'obrigatoria' ou 'opcional'.");
+                    }
+
+                    if (tipoDisciplina.equals("obrigatoria")) {
+                        int i = 1;
+                        List<Discipline> obrigatorias = Discipline.getDisciplinasObrigatoriasFromFile();
+                        for (Discipline d : obrigatorias) {
+                            System.out.println(i + ". " + d.getName());
+                            i++;
+                        }
+                        System.out.print("Escolha o número da disciplina para matrícula: ");
+                        int escolhaDisc = Integer.parseInt(scanner.nextLine());
+                        if (escolhaDisc < 1 || escolhaDisc > obrigatorias.size()) {
+                            System.out.println("Opção inválida.");
+                            break; // Volta ao menu principal
+                        }
+                        Discipline disciplinaEscolhida = obrigatorias.get(escolhaDisc - 1);
+                        enrolment.enrolCourse(disciplinaEscolhida, alunoEscolhido);
+                    } else {
+                        int i = 1;
+                        List<Discipline> opcionais = Discipline.getDisciplinasOpcionaisFromFile();
+                        for (Discipline d : opcionais) {
+                            System.out.println(i + ". " + d.getName());
+                            i++;
+                        }
+                        System.out.print("Escolha o número da disciplina para matrícula: ");
+                        int escolhaDisc = Integer.parseInt(scanner.nextLine());
+                        if (escolhaDisc < 1 || escolhaDisc > opcionais.size()) {
+                            System.out.println("Opção inválida.");
+                            break; // Volta ao menu principal
+                        }
+                        Discipline disciplinaEscolhida = opcionais.get(escolhaDisc - 1);
+                        enrolment.enrolOptionaldiscipline(disciplinaEscolhida);
+                    }
+                    System.out.println("Matrícula realizada!");
+                    break; // Volta ao menu principal
                 case 8:
                     if (secretary == null) {
                         System.out.println("Crie um secretário primeiro.");

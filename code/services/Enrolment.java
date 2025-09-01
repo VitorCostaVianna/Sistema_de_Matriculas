@@ -14,6 +14,9 @@ public class Enrolment {
     private Student student;
     private List<Discipline> disciplines;
 
+    private int obrigatoriasMatriculadas = 0;
+    private int opcionaisMatriculadas = 0;
+
     public Enrolment(Student student) {
         this.student = student;
         this.disciplines = new ArrayList<>();
@@ -31,33 +34,56 @@ public class Enrolment {
     }
 
     public void enrolCourse(Discipline discipline, Student student) {
-        if (student.isEnrolmentActive() && verifyenrolPeriodDate()) {
-            this.disciplines.add(discipline);
-            try {
-                java.io.File file = new java.io.File("AlunoDisciplinas.txt");
-                java.io.FileWriter writer = new java.io.FileWriter(file, true);
-                writer.write("Aluno: " + student.getName()
-                    + ", Email: " + student.getEmail()
-                    + ", Disciplina: " + discipline.getName()
-                    + System.lineSeparator());
-                writer.close();
-                System.out.println("Aluno registrado em AlunoDisciplinas.txt!");
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Aluno NÃO registrado: matrícula inativa ou período inválido.");
+        if (obrigatoriasMatriculadas >= 4) {
+            System.out.println("Limite de 4 disciplinas obrigatórias atingido.");
+            return;
         }
+        if (disciplines.contains(discipline)) {
+            System.out.println("Aluno já está matriculado nesta disciplina obrigatória.");
+            return;
+        }
+        disciplines.add(discipline);
+        obrigatoriasMatriculadas++; // Incrementa ao matricular
+        try {
+            java.io.File file = new java.io.File("AlunoDisciplinas.txt");
+            java.io.FileWriter writer = new java.io.FileWriter(file, true);
+            writer.write("Aluno: " + student.getName()
+                + ", Email: " + student.getEmail()
+                + ", Disciplina: " + discipline.getName()
+                + System.lineSeparator());
+            writer.close();
+            System.out.println("Aluno registrado em AlunoDisciplinas.txt!");
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Matrícula obrigatória realizada!");
     }
 
     public void enrolOptionaldiscipline(Discipline discipline) {
-        if (student.isEnrolmentActive() && verifyenrolPeriodDate()) {
-            this.disciplines.add(discipline);
+        if (opcionaisMatriculadas >= 2) {
+            System.out.println("Limite de 2 disciplinas opcionais atingido.");
+            return;
         }
-
-        // PaymentSystem.getInstancia().gerarCobranca(student); - > notifica o sistema de pagamento 
-
-        // TODO - remover curso no arquivo
+        if (disciplines.contains(discipline)) {
+            System.out.println("Aluno já está matriculado nesta disciplina opcional.");
+            return;
+        }
+        disciplines.add(discipline);
+        opcionaisMatriculadas++; // Incrementa ao matricular
+        try {
+            java.io.File file = new java.io.File("AlunoDisciplinas.txt");
+            java.io.FileWriter writer = new java.io.FileWriter(file, true);
+            writer.write("Aluno: " + student.getName()
+                + ", Email: " + student.getEmail()
+                + ", Disciplina: " + discipline.getName()
+                + ", Tipo: Opcional"
+                + System.lineSeparator());
+            writer.close();
+            System.out.println("Aluno registrado em AlunoDisciplinas.txt!");
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Matrícula opcional realizada!");
     }
 
     public void canceldiscipline(Discipline discipline) {
@@ -121,4 +147,8 @@ public class Enrolment {
         return false;
     }
 }
+
+
+
+
 }
